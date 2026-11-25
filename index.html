@@ -46,8 +46,24 @@
 </head>
 <body class="text-white flex flex-col justify-between min-h-screen">
 
+  <!-- ปุ่มลอยมุมขวาบนสำหรับออกจากโหมดเต็มจอ (แสดงเฉพาะตอนเปิด Full Screen) -->
+  <div id="floating-controls" class="hidden fixed top-4 right-4 z-40 flex items-center gap-2">
+    <button onclick="toggleMute()" id="btn-mute-floating"
+      class="px-3.5 py-2 rounded-xl bg-black/50 hover:bg-black/70 backdrop-blur-md border border-white/20 text-white text-sm font-semibold shadow-lg transition flex items-center gap-1.5">
+      <span id="mute-icon-floating">🔊</span>
+      <span>ปิด/เปิดเสียง</span>
+    </button>
+    <button onclick="toggleFullScreen()" 
+      class="px-3.5 py-2 rounded-xl bg-rose-600/80 hover:bg-rose-500 backdrop-blur-md border border-rose-400/50 text-white text-sm font-semibold shadow-lg transition flex items-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <span>ออกจากเต็มจอ</span>
+    </button>
+  </div>
+
   <!-- ================= แถบส่วนหัว (Header Bar พร้อมโลโก้กลุ่มนิเทศ) ================= -->
-  <header class="w-full glass-bar border-b sticky top-0 z-30 shadow-lg">
+  <header id="main-header" class="w-full glass-bar border-b sticky top-0 z-30 shadow-lg transition-all">
     <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-center gap-3.5 text-center">
       <img src="https://gorpor.github.io/ry2spinwheel/logo-supervision.png" 
            alt="โลโก้กลุ่มนิเทศ ติดตาม และประเมินผลการจัดการศึกษา สพป.ระยอง เขต 2" 
@@ -59,7 +75,7 @@
   </header>
 
   <!-- ================= พื้นที่เนื้อหาหลัก (Main Content) ================= -->
-  <main class="flex-grow flex items-center justify-center p-4 my-4">
+  <main class="flex-grow flex items-center justify-center p-4 my-2">
 
     <!-- ================= ขั้นตอนที่ 1: ระบุจำนวนข้อมูล ================= -->
     <div id="step-count" class="glass-panel rounded-3xl p-8 max-w-md w-full shadow-2xl text-center animate-pop">
@@ -113,10 +129,10 @@
     </div>
 
     <!-- ================= ขั้นตอนที่ 3: หน้าวงล้อสุ่ม ================= -->
-    <div id="step-wheel" class="hidden w-full max-w-4xl flex flex-col items-center animate-pop">
+    <div id="step-wheel" class="hidden w-full max-w-5xl flex flex-col items-center animate-pop">
       
-      <!-- แถบเครื่องมือด้านบน (แยกปุ่มแก้ไขข้อมูล และ ปุ่มเริ่มใหม่) -->
-      <div class="w-full flex flex-wrap justify-between items-center gap-3 mb-6 glass-panel p-3 rounded-2xl">
+      <!-- แถบเครื่องมือด้านบน (ซ่อนอัตโนมัติเมื่อกด Full Screen) -->
+      <div id="wheel-toolbar" class="w-full flex flex-wrap justify-between items-center gap-3 mb-6 glass-panel p-3 rounded-2xl">
         
         <!-- กลุ่มปุ่มด้านซ้าย: แก้ไขข้อมูล และ เริ่มใหม่ -->
         <div class="flex flex-wrap items-center gap-2">
@@ -142,26 +158,37 @@
           เหลือตัวเลือก: <span id="remaining-count" class="text-amber-300 text-lg font-bold">0</span> รายการ
         </div>
 
-        <!-- ปุ่มเปิด/ปิดเสียงด้านขวา -->
-        <button id="btn-mute" onclick="toggleMute()" 
-          class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold transition">
-          <span id="mute-icon">🔊</span>
-          <span id="mute-text">เปิดเสียงอยู่</span>
-        </button>
+        <!-- กลุ่มปุ่มด้านขวา: ปิด/เปิดเสียง และ Full Screen -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="btn-mute" onclick="toggleMute()" 
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold transition">
+            <span id="mute-icon">🔊</span>
+            <span id="mute-text">ปิด/เปิดเสียง</span>
+          </button>
+
+          <button id="btn-fullscreen" onclick="toggleFullScreen()" 
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-500/30 hover:bg-indigo-500/50 border border-indigo-400/50 text-indigo-100 font-semibold transition"
+            title="ขยายเต็มหน้าจอสำหรับขึ้นจอโปรเจกเตอร์">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+            </svg>
+            <span>เต็มจอ</span>
+          </button>
+        </div>
       </div>
 
       <!-- พื้นที่แสดงวงล้อ -->
-      <div class="relative flex items-center justify-center my-2">
+      <div id="wheel-wrapper" class="relative flex items-center justify-center my-2 transition-all duration-300">
         <!-- เข็มชี้ด้านขวา (ชี้เข้าหาวงล้อ) -->
         <div class="absolute -right-4 md:-right-6 z-20 drop-shadow-[0_4px_10px_rgba(0,0,0,0.8)]">
-          <svg class="w-12 h-12 md:w-14 md:h-14 text-amber-400 transform rotate-180" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-12 h-12 md:w-16 md:h-16 text-amber-400 transform rotate-180" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2L2 22l10-6 10 6L12 2z" transform="rotate(90 12 12)"/>
           </svg>
         </div>
 
         <!-- ขอบเรืองแสงรอบวงล้อ -->
         <div class="p-3 rounded-full bg-gradient-to-tr from-amber-400 via-pink-500 to-cyan-400 shadow-[0_0_50px_rgba(236,72,153,0.5)]">
-          <canvas id="wheel-canvas" width="420" height="420" class="rounded-full bg-slate-900 max-w-[85vw] max-h-[85vw]"></canvas>
+          <canvas id="wheel-canvas" width="440" height="440" class="rounded-full bg-slate-900 max-w-[85vw] max-h-[85vw] transition-all duration-300"></canvas>
         </div>
 
         <!-- จุดศูนย์กลางวงล้อ -->
@@ -172,7 +199,7 @@
 
       <!-- ปุ่มหมุนวงล้อหลัก -->
       <button id="btn-spin" onclick="spinWheel()" 
-        class="mt-8 px-12 py-5 rounded-full font-extrabold text-2xl tracking-wide bg-gradient-to-r from-amber-400 via-pink-500 to-indigo-500 hover:from-amber-300 hover:to-indigo-400 text-white shadow-[0_0_30px_rgba(245,158,11,0.6)] transform hover:scale-105 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+        class="mt-6 px-12 py-5 rounded-full font-extrabold text-2xl tracking-wide bg-gradient-to-r from-amber-400 via-pink-500 to-indigo-500 hover:from-amber-300 hover:to-indigo-400 text-white shadow-[0_0_30px_rgba(245,158,11,0.6)] transform hover:scale-105 transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
         🎯 หมุนวงล้อ!
       </button>
     </div>
@@ -180,7 +207,7 @@
   </main>
 
   <!-- ================= ส่วนท้าย (Footer) ================= -->
-  <footer class="w-full glass-bar border-t py-5 px-4 text-center text-xs sm:text-sm text-gray-300 leading-relaxed">
+  <footer id="main-footer" class="w-full glass-bar border-t py-5 px-4 text-center text-xs sm:text-sm text-gray-300 leading-relaxed transition-all">
     <div class="max-w-4xl mx-auto space-y-0.5">
       <p class="font-bold text-amber-300 text-sm sm:text-base">กลุ่มงานสื่อ นวัตกรรม และเทคโนโลยีทางการศึกษา</p>
       <p class="font-medium text-gray-200">กลุ่มนิเทศ ติดตาม และประเมินผลการจัดการศึกษา</p>
@@ -232,11 +259,68 @@
     let currentRotation = 0;
     let isSpinning = false;
     let isMuted = false;
+    let isFullScreenMode = false;
     let selectedIndex = -1;
     let audioCtx = null;
 
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
+
+    // ---------------- ระบบ Full Screen สำหรับขึ้นจอ/เครื่องฉาย ----------------
+    function toggleFullScreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        const docEl = document.documentElement;
+        if (docEl.requestFullscreen) {
+          docEl.requestFullscreen().catch(() => applyPresentationLayout(true));
+        } else if (docEl.webkitRequestFullscreen) {
+          docEl.webkitRequestFullscreen();
+        } else {
+          applyPresentationLayout(true);
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    // จัด Layout เมื่อเข้า/ออกโหมดเต็มจอ (ซ่อน Header, Toolbar, Footer และขยายวงล้อให้ใหญ่ขึ้น)
+    function applyPresentationLayout(active) {
+      isFullScreenMode = active;
+      const header = document.getElementById('main-header');
+      const toolbar = document.getElementById('wheel-toolbar');
+      const footer = document.getElementById('main-footer');
+      const floating = document.getElementById('floating-controls');
+
+      if (active) {
+        header.classList.add('hidden');
+        toolbar.classList.add('hidden');
+        footer.classList.add('hidden');
+        floating.classList.remove('hidden');
+        // ขยายขนาดวงล้อให้เต็มตาบนโปรเจกเตอร์
+        canvas.width = 540;
+        canvas.height = 540;
+      } else {
+        header.classList.remove('hidden');
+        toolbar.classList.remove('hidden');
+        footer.classList.remove('hidden');
+        floating.classList.add('hidden');
+        // คืนขนาดวงล้อปกติ
+        canvas.width = 440;
+        canvas.height = 440;
+      }
+      drawWheel();
+    }
+
+    // ตรวจจับการกด Esc หรือออกจาก Full Screen ของเบราว์เซอร์
+    document.addEventListener('fullscreenchange', () => {
+      applyPresentationLayout(!!document.fullscreenElement);
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+      applyPresentationLayout(!!document.webkitFullscreenElement);
+    });
 
     // ---------------- ระบบเสียงสังเคราะห์ (Web Audio API) ----------------
     function initAudio() {
@@ -248,7 +332,6 @@
       }
     }
 
-    // เสียงติ๊กๆ ตอนวงล้อหมุนผ่านแต่ละช่อง
     function playTickSound() {
       if (isMuted) return;
       initAudio();
@@ -267,12 +350,10 @@
       osc.stop(audioCtx.currentTime + 0.04);
     }
 
-    // เสียงพลุและเสียงฉลองเมื่อวงล้อหยุด
     function playFireworkSound() {
       if (isMuted) return;
       initAudio();
       
-      // 1. เสียงระเบิดพลุ (White Noise + Lowpass Filter)
       const bufferSize = audioCtx.sampleRate * 1.2;
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
@@ -297,8 +378,7 @@
       noiseGain.connect(audioCtx.destination);
       noise.start();
 
-      // 2. เสียงทำนองฉลอง (Fanfare Chords)
-      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      const notes = [523.25, 659.25, 783.99, 1046.50];
       notes.forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -337,7 +417,6 @@
       container.innerHTML = '';
 
       for (let i = 0; i < count; i++) {
-        // หากมีข้อมูลเดิมให้ใช้ข้อมูลเดิม ถ้าไม่มีให้เติม "ข้อมูลที่ 1", "ข้อมูลที่ 2" ให้อัตโนมัติ
         const val = (existingData[i] !== undefined && existingData[i].trim() !== '') 
                     ? existingData[i] 
                     : `ข้อมูลที่ ${i + 1}`;
@@ -360,7 +439,6 @@
       document.getElementById('step-count').classList.remove('hidden');
     }
 
-    // ปุ่มแก้ไขข้อมูล: กลับไปหน้ากรอกข้อมูลพร้อมคงข้อมูลเดิมไว้ให้แก้ไขได้
     function editData() {
       if (isSpinning) return;
       const currentCount = items.length > 0 ? items.length : parseInt(document.getElementById('item-count-input').value);
@@ -371,7 +449,6 @@
       document.getElementById('step-inputs').classList.remove('hidden');
     }
 
-    // ปุ่มเริ่มใหม่: ล้างข้อมูลทั้งหมดและกลับไปหน้าตั้งค่าจำนวนเริ่มต้น (Step 1)
     function resetAll() {
       if (isSpinning) return;
       items = [];
@@ -435,7 +512,6 @@
         const startAngle = currentRotation + i * sliceAngle;
         const endAngle = startAngle + sliceAngle;
 
-        // วาดชิ้นส่วนวงล้อ
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -446,7 +522,6 @@
         ctx.strokeStyle = 'rgba(255,255,255,0.4)';
         ctx.stroke();
 
-        // วาดข้อความ
         ctx.save();
         ctx.translate(centerX, centerY);
         ctx.rotate(startAngle + sliceAngle / 2);
@@ -455,15 +530,16 @@
         ctx.shadowColor = 'rgba(0,0,0,0.6)';
         ctx.shadowBlur = 4;
         
-        // ปรับขนาดฟอนต์ตามจำนวนรายการ
-        const fontSize = numItems > 20 ? 12 : numItems > 10 ? 15 : 18;
+        // ขยายฟอนต์อัตโนมัติเมื่ออยู่ในโหมด Full Screen
+        const scaleFactor = isFullScreenMode ? 1.25 : 1;
+        const baseFont = numItems > 20 ? 12 : numItems > 10 ? 16 : 20;
+        const fontSize = Math.round(baseFont * scaleFactor);
         ctx.font = `bold ${fontSize}px Prompt, sans-serif`;
 
-        // ตัดข้อความถ้ายาวเกินไป
         let label = items[i];
         if (label.length > 16) label = label.substring(0, 15) + '...';
         
-        ctx.fillText(label, radius - 22, fontSize / 3);
+        ctx.fillText(label, radius - 26, fontSize / 3);
         ctx.restore();
       }
     }
@@ -480,12 +556,11 @@
       isSpinning = true;
       document.getElementById('btn-spin').disabled = true;
 
-      // สุ่มจำนวนรอบ (5 - 8 รอบ) + มุมสุ่ม
       const extraSpins = (5 + Math.random() * 3) * 2 * Math.PI;
       const randomAngle = Math.random() * 2 * Math.PI;
       const totalTargetRotation = currentRotation + extraSpins + randomAngle;
       
-      const duration = 4500; // 4.5 วินาที
+      const duration = 4500;
       const startTime = performance.now();
       const startRotation = currentRotation;
       const sliceAngle = (2 * Math.PI) / items.length;
@@ -500,7 +575,6 @@
         
         drawWheel();
 
-        // คำนวณเสียงติ๊กเมื่อเข็มชี้ (อยู่ที่มุม 0 เรเดียน / ด้านขวา) ผ่านเส้นแบ่งช่อง
         const normalizedAngle = (2 * Math.PI - (currentRotation % (2 * Math.PI))) % (2 * Math.PI);
         const currentSliceIndex = Math.floor(normalizedAngle / sliceAngle);
         if (currentSliceIndex !== lastSliceIndex) {
@@ -514,7 +588,6 @@
           isSpinning = false;
           document.getElementById('btn-spin').disabled = false;
           
-          // หาผู้ชนะที่ตรงกับเข็มชี้ด้านขวา (มุม 0)
           const finalAngle = (2 * Math.PI - (currentRotation % (2 * Math.PI))) % (2 * Math.PI);
           selectedIndex = Math.floor(finalAngle / sliceAngle) % items.length;
           
@@ -573,6 +646,12 @@
       document.getElementById('winner-modal').classList.add('hidden');
       
       if (items.length === 0) {
+        // ออกจากโหมดเต็มจอก่อนกลับหน้าเริ่มต้น
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          applyPresentationLayout(false);
+        }
         alert('ข้อมูลในวงล้อถูกสุ่มออกครบทั้งหมดแล้ว ระบบจะพากลับไปหน้าเริ่มต้น');
         resetAll();
       }
@@ -586,19 +665,24 @@
     function toggleMute() {
       isMuted = !isMuted;
       const icon = document.getElementById('mute-icon');
-      const text = document.getElementById('mute-text');
+      const iconFloating = document.getElementById('mute-icon-floating');
       const btn = document.getElementById('btn-mute');
+      const btnFloating = document.getElementById('btn-mute-floating');
 
       if (isMuted) {
         icon.innerText = '🔇';
-        text.innerText = 'ปิดเสียงแล้ว';
+        iconFloating.innerText = '🔇';
         btn.classList.add('bg-rose-500/20', 'border-rose-400/50', 'text-rose-200');
         btn.classList.remove('bg-white/10', 'border-white/20', 'text-white');
+        btnFloating.classList.add('bg-rose-600/70', 'border-rose-400/50');
+        btnFloating.classList.remove('bg-black/50', 'border-white/20');
       } else {
         icon.innerText = '🔊';
-        text.innerText = 'เปิดเสียงอยู่';
+        iconFloating.innerText = '🔊';
         btn.classList.remove('bg-rose-500/20', 'border-rose-400/50', 'text-rose-200');
         btn.classList.add('bg-white/10', 'border-white/20', 'text-white');
+        btnFloating.classList.remove('bg-rose-600/70', 'border-rose-400/50');
+        btnFloating.classList.add('bg-black/50', 'border-white/20');
       }
     }
   </script>
