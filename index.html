@@ -93,7 +93,7 @@
           5 รายการ
         </span>
       </div>
-      <p class="text-gray-300 text-sm mb-4">ใส่ข้อความหรือรายชื่อให้ครบทุกช่อง</p>
+      <p class="text-gray-300 text-sm mb-4">แก้ไขข้อความได้ตามต้องการ หรือกดตกลงเพื่อใช้ข้อมูลเริ่มต้นทันที</p>
 
       <!-- พื้นที่สร้าง Textbox ตามจำนวน -->
       <div id="inputs-container" class="space-y-3 max-h-[50vh] overflow-y-auto pr-2 mb-6">
@@ -337,7 +337,10 @@
       container.innerHTML = '';
 
       for (let i = 0; i < count; i++) {
-        const val = existingData[i] !== undefined ? existingData[i] : '';
+        // หากมีข้อมูลเดิมให้ใช้ข้อมูลเดิม ถ้าไม่มีให้เติม "ข้อมูลที่ 1", "ข้อมูลที่ 2" ให้อัตโนมัติ
+        const val = (existingData[i] !== undefined && existingData[i].trim() !== '') 
+                    ? existingData[i] 
+                    : `ข้อมูลที่ ${i + 1}`;
         const div = document.createElement('div');
         div.className = 'flex items-center gap-3';
         div.innerHTML = `
@@ -346,7 +349,7 @@
             ${i + 1}
           </span>
           <input type="text" class="item-textbox w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:border-amber-400 transition"
-                 placeholder="ข้อมูลช่องที่ ${i + 1}" value="${val}">
+                 placeholder="ข้อมูลที่ ${i + 1}" value="${val}">
         `;
         container.appendChild(div);
       }
